@@ -94,7 +94,6 @@ def main():
             dfn.loc["Income", :] = -dfn.loc["Income", :].values
 
         st.subheader('Multiperiod report')
-
         if st.checkbox('Time is on X-axis', value=True):
             st.dataframe(dfn.groupby(gb).sum())
         else:
@@ -106,6 +105,7 @@ def main():
                    .sum()\
                    .transpose()\
                    .reset_index()
+
         df_L0.columns.name = "Account"
         if plot_type == "pyplot":
             fig = plt.figure(figsize=(10, 4))
@@ -119,16 +119,16 @@ def main():
                           .set_index(time_interval)\
                           .stack()\
                           .reset_index()\
-                          .rename(columns={0: "Amount"})
+                          .rename(columns={0:  dfn.columns.levels[0][0]})
             custom_spacing = 2
             chart = alt.Chart(df_new).mark_bar().encode(
                 column=alt.Column(time_interval, spacing=custom_spacing, header=alt.Header(title="Income and Expenses",
                                   labelOrient='bottom', labelAlign='right', labelAngle=-90)),
                 x=alt.X('Account:O', axis=alt.Axis(title=None, labels=False, ticks=False)),
-                y=alt.Y('Amount:Q', title="Amount", axis=alt.Axis(grid=False)),
+                y=alt.Y('{}:Q'.format(dfn.columns.levels[0][0]), title=dfn.columns.levels[0][0], axis=alt.Axis(grid=False)),
                 color=alt.Color('Account', scale=alt.Scale(range=['#EA98D2', '#659CCA'])),
                 tooltip=[alt.Tooltip('Account:O', title='Account'),
-                         alt.Tooltip('Amount:Q', title="Amount"),
+                         alt.Tooltip('{}:Q'.format(dfn.columns.levels[0][0]), title=dfn.columns.levels[0][0]),
                          alt.Tooltip('{}:N'.format(time_interval), title=time_interval)]
                                 ).properties(width=(700 - n_intervals*custom_spacing)/n_intervals)
             st.altair_chart(chart, use_container_width=False)
