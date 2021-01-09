@@ -106,6 +106,7 @@ def income_expenses_over_time(df_orig):
         ax = plt.axes()
         df_L0.plot.bar(ax=ax, x=time_interval, y=["Income", "Expenses"],
                        xlabel=time_interval, ylabel=df_L0["level_0"][0], rot=90)
+        ax.locator_params(axis="x", tight=True, nbins=40)
         st.pyplot(fig)
     elif plot_type == "altair":
         n_intervals = df_L0.shape[0]
