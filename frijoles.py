@@ -123,7 +123,7 @@ def income_expenses_over_time(df_orig):
 
     df_L0.columns.name = "Account"
     if plot_type == "pyplot":
-        fig = plt.figure(figsize=(15, 5))
+        fig = plt.figure(figsize=(14, 5))
         ax = plt.axes()
         df_L0.plot.bar(ax=ax, x=time_interval, y=["Income", "Expenses"],
                        xlabel=time_interval, ylabel=df_L0["level_0"][0], rot=90)
@@ -148,7 +148,7 @@ def income_expenses_over_time(df_orig):
             tooltip=[alt.Tooltip('Account:O', title='Account'),
                      alt.Tooltip('{}:Q'.format(dfn.columns.levels[0][0]), title=dfn.columns.levels[0][0]),
                      alt.Tooltip('{}:N'.format(time_interval), title=time_interval)]
-        ).properties(width=(1000 - n_intervals * custom_spacing) / n_intervals)
+        ).properties(width=(700 - n_intervals * custom_spacing) / n_intervals)
         st.altair_chart(chart, use_container_width=False)
     return
 
@@ -195,7 +195,6 @@ def main():
     if file_name is not None:
         try:
             with st.spinner("Uploading your *.beancount file..."):
-                print(file_name.name)
                 df_orig = load_beancount_file(file_name.name)
         except Exception as e:
             st.error(
