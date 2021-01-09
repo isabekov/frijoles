@@ -34,6 +34,7 @@ def load_beancount_file(file_name):
     df = df[["Account", "Year", "Month", "Amount ({})".format(currency)]].fillna(0)
     df["YearMonth"] = df.apply(lambda x: "{}-{:0>2d}".format(x["Year"], x["Month"]), axis=1)
     df = df[["Account", "YearMonth", "Amount ({})".format(currency)]]
+    os.remove(file_name)
     return df
 
 
@@ -191,11 +192,15 @@ def treemap_analysis(df):
 def main():
     st.title('Frijoles: a web-interface for Beancount accounting system')
     file_name = st.sidebar.file_uploader("Upload *.beancount file:")
-
     if file_name is not None:
         try:
             with st.spinner("Uploading your *.beancount file..."):
-                df_orig = load_beancount_file(file_name.name)
+                if file_name.name.startswith("tmp-frijoles-"):
+                    st.error("You are trying to upload a temporary frijoles-file. Rename file and try again.")
+                else:
+                    with open("tmp-frijoles-{}.file".format(file_name.name), 'wb') as tmp_file:
+                        tmp_file.write(file_name.getvalue())
+                    df_orig = load_beancount_file("tmp-frijoles-{}.file".format(file_name.name))
         except Exception as e:
             st.error(
                 f"Sorry, there was a problem processing your *.beancount file.\n {e}"
