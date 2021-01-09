@@ -6,6 +6,8 @@ import streamlit as st
 import altair as alt
 import squarify
 from matplotlib import pyplot as plt
+from bokeh.plotting import figure
+from bokeh.models import ColumnDataSource, FactorRange
 from beancount.loader import load_file
 from beancount.query.query import run_query
 from beancount.query.numberify import numberify_results
@@ -116,7 +118,7 @@ def income_expenses_over_time(df_orig):
     if st.sidebar.checkbox('Invert sign of "Income"', value=True):
         dfn.loc["Income", :] = -dfn.loc["Income", :].values
     st.subheader('Income and Expenses over Time')
-    plot_type = st.sidebar.selectbox('Plot type', ["pyplot", "altair"], key="plot_type")
+    plot_type = st.sidebar.selectbox('Plot type', ["pyplot", "altair", "bokeh"], key="plot_type")
     df_L0 = dfn.groupby(["Account_L0"]) \
         .sum() \
         .transpose() \
@@ -151,6 +153,18 @@ def income_expenses_over_time(df_orig):
                      alt.Tooltip('{}:N'.format(time_interval), title=time_interval)]
         ).properties(width=(700 - n_intervals * custom_spacing) / n_intervals)
         st.altair_chart(chart, use_container_width=False)
+    elif plot_type == "bokeh":
+        x = [(ti, acnt) for ti in df_L0[time_interval] for acnt in ["Income", "Expenses"]]
+        counts = sum(zip(df_L0['Income'], df_L0['Expenses']), ())
+        source = ColumnDataSource(data=dict(x=x, counts=counts))
+        p = figure(x_range=FactorRange(*x), plot_height=450, plot_width=900, title="Income and Expenses",
+                   toolbar_location="above", tooltips=[("Period, Account", "@x"), ("Value", "@counts")])
+        p.vbar(x='x', top='counts', width=0.9, source=source)
+        p.y_range.start = 0
+        p.x_range.range_padding = 0.5
+        p.xaxis.major_label_orientation = 1
+        p.xgrid.grid_line_color = None
+        st.bokeh_chart(p)
     return
 
 
