@@ -41,3 +41,9 @@ This code is distributed under the terms of the "GNU GPLv2 only".
 ### Treemap Plot of Expenses
 ![Treemap Plot of Expenses](Figures/Treemap_View.png)
 
+
+## Debugging in PyCharm
+Add the following run configuration and use normal debug mode:
+
+![PyCharm Debugging](Figures/PyCharm_Debugging.png)
+
