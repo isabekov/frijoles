@@ -156,7 +156,9 @@ def treemap_analysis(df):
 
     # If there are many subcategories of an account, repeat the list of colors many times
     # to make the number of colors sufficient.
-    for ax, txt, color in zip(axes, labels, plt.cm.Pastel1.colors*5):
+    colormap = plt.cm.Pastel1.colors
+    n_reps = round(len(rects)/len(colormap)) + 1
+    for ax, txt, color in zip(axes, labels, colormap*n_reps):
         ax.text(0.5, 0.5, txt, horizontalalignment='center', verticalalignment='center')
         ax.set_yticks([])
         ax.set_xticks([])
