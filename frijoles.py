@@ -1,5 +1,7 @@
+import os
 import pandas as pd
 import numpy as np
+import base64
 import streamlit as st
 import altair as alt
 import squarify
@@ -64,7 +66,22 @@ def time_interval_aggregation(df_orig, time_period):
     return df.copy(), n_levels
 
 
-def multiperiod_table(df_orig):
+def get_table_download_link(df, sep, base_file_name):
+    """Generates a link allowing the data in a given panda dataframe to be downloaded
+    """
+    if sep == ",":
+        sep_type = "c"
+    else:
+        sep_type = "d"
+    csv = df.reset_index().to_csv(index=False, sep=sep)
+    b64 = base64.b64encode(
+        csv.encode()
+    ).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="{base_file_name}.{sep_type}sv">'\
+           f'Download {sep_type.upper()}SV file</a>'
+
+
+def multiperiod_table(df_orig, base_file_name):
     # Time interval aggregation level
     time_interval = st.sidebar.radio(
         "Time interval:", ("Month", "Quarter", "Year"), index=1)
@@ -79,10 +96,14 @@ def multiperiod_table(df_orig):
         dfn.loc["Income", :] = -dfn.loc["Income", :].values
 
     st.subheader('Multiperiod report')
-    if st.checkbox('Time is on X-axis', value=True):
-        st.dataframe(dfn.groupby(gb).sum())
+    if st.sidebar.checkbox('Time is on X-axis', value=True):
+        dfs = dfn.groupby(gb).sum()
     else:
-        st.dataframe(dfn.groupby(gb).sum().transpose())
+        dfs = dfn.groupby(gb).sum().transpose()
+    st.dataframe(dfs)
+    sep = st.sidebar.selectbox("Separator for CSV/DSV file", (",", "|", ";"))
+    if st.sidebar.button("Download table"):
+        st.sidebar.markdown(get_table_download_link(dfs, sep, base_file_name), unsafe_allow_html=True)
     return
 
 
@@ -180,11 +201,11 @@ def main():
             st.error(
                 f"Sorry, there was a problem processing your *.beancount file.\n {e}"
             )
-
+        base_file_name = os.path.splitext(file_name.name)[0]
         analysis_type = st.sidebar.radio("Analysis type:",
                                          ("Multiperiod table", "Income & Expenses over time", "Treemap"))
         if analysis_type == "Multiperiod table":
-            multiperiod_table(df_orig)
+            multiperiod_table(df_orig, base_file_name)
         elif analysis_type == "Income & Expenses over time":
             income_expenses_over_time(df_orig)
         elif analysis_type == "Treemap":
