@@ -1,0 +1,8 @@
+pandas
+numpy
+streamlit
+altair
+squarify
+matplotlib
+beancount
+
