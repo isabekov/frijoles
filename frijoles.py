@@ -167,7 +167,6 @@ def treemap_analysis(df):
 
 def main():
     st.title('Frijoles: a web-interface for Beancount accounting system')
-    st.sidebar.header('Multiperiod report')
     file_name = st.sidebar.file_uploader("Upload *.beancount file:")
 
     if file_name is not None:
@@ -181,10 +180,10 @@ def main():
             )
 
         analysis_type = st.sidebar.radio("Analysis type:",
-                                         ("Multiperiod table", "Income & Expenses over Time", "Treemap"))
+                                         ("Multiperiod table", "Income & Expenses over time", "Treemap"))
         if analysis_type == "Multiperiod table":
             multiperiod_table(df_orig)
-        elif analysis_type == "Income & Expenses over Time":
+        elif analysis_type == "Income & Expenses over time":
             income_expenses_over_time(df_orig)
         elif analysis_type == "Treemap":
             treemap_analysis(df_orig)
