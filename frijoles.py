@@ -10,7 +10,7 @@ from beancount.loader import load_file
 from beancount.query.query import run_query
 from beancount.query.numberify import numberify_results
 
-st.set_page_config(layout="wide", page_title="Frijoles", page_icon="frijoles.png")
+st.set_page_config(layout="wide", page_title="Frijoles", page_icon="Figures/frijoles.png")
 
 
 @st.cache
