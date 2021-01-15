@@ -169,13 +169,18 @@ def income_expenses_over_time(df_orig):
 
 
 def treemap_analysis(df):
-    df, n_levels = time_interval_aggregation(df, "Year")
-    account = st.sidebar.radio('Account:', ("Income", "Expenses"), index=1)
-
+    df, n_levels = time_interval_aggregation(df, "Month")
     df_L1 = df.groupby(["Account_L0", "Account_L1"]).sum()
-    tot = df_L1.sum(axis=1).to_frame()
+    list_of_months =  [k[1] for k in df.columns.to_list()]
+    start_month = st.sidebar.selectbox('Start month (including)', list_of_months, key=list_of_months[0])
+    idx = list_of_months.index(start_month)
+    end_month = st.sidebar.selectbox('End month (including)', list_of_months[idx+1:], key=list_of_months[-1])
+    amount_curr_col = df.columns[0][0]
+    df_L1_filt = df_L1.loc[:, (amount_curr_col, start_month):(amount_curr_col, end_month)]
+    tot = df_L1_filt.sum(axis=1).to_frame()
 
     # Treemap Plot of account
+    account = st.sidebar.radio('Account:', ("Income", "Expenses"), index=1)
     data = tot.loc[account].sort_values(by=0, ascending=False)
     idx = [k[0] != 0 for k in data.values]
     values = data.values[idx]
